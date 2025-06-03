@@ -6,7 +6,7 @@ const itemFilter = document.getElementById('filter');
 const items = itemList.querySelectorAll('li');
 
 // Function to add an item
-function addItem(e){
+function onAddItemSubmit(e){
     // Prevent the default form submission behavior
     e.preventDefault();
     const newItem = itemInput.value; 
@@ -17,19 +17,45 @@ function addItem(e){
         return;
     }
 
+    //Create item DOM element
+    addItemToDOM(newItem);
+
+    //Add item to local storage
+    addItemToStorage(newItem);
+
+    checkUI();
+
+    itemInput.value = '';
+}
+
+// Function to add an item to the DOM
+function addItemToDOM(item){
     // Create a new list item
     const li = document.createElement('li');
-    li.appendChild(document.createTextNode(newItem));
+    li.appendChild(document.createTextNode(item));
 
     const button = createButton('Remove', 'remove-item btn-link text-red');
     li.appendChild(button);
 
     // Add li to the DOM
     itemList.appendChild(li);
+}
 
-    checkUI();
+// Function to add an item to local storage
+function addItemToStorage(item){
+    let itemsFromStorage;
 
-    itemInput.value = '';
+    if (localStorage.getItem('items') === null){
+        itemsFromStorage = [];
+    }else{
+        itemsFromStorage = JSON.parse(localStorage.getItem('items'));
+    }
+
+    //Add new item to array
+    itemsFromStorage.push(item);
+
+    //Convert to JSON string and set to local storage
+    localStorage.setItem('items',JSON.stringify(itemsFromStorage));
 }
 
 // Function to create a button with an icon
@@ -78,6 +104,7 @@ function checkUI(){
     }
 }
 
+// Function to filter items
 function filterItems(e) {
     const items = itemList.querySelectorAll('li');
     const text = e.target.value.toLowerCase();
@@ -94,7 +121,7 @@ function filterItems(e) {
 }
 
 // Event listeners
-itemForm.addEventListener('submit', addItem);
+itemForm.addEventListener('submit', onAddItemSubmit);
 itemList.addEventListener('click', removeItem);
 clearBtn.addEventListener('click', clearItems);
 itemFilter.addEventListener('input', filterItems);
