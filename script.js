@@ -5,6 +5,13 @@ const clearBtn = document.getElementById('clear');
 const itemFilter = document.getElementById('filter');
 const items = itemList.querySelectorAll('li');
 
+// Function to display items from local storage
+function displayItems(){
+    const itemsFromStorage = getItemsFromStorage();
+    itemsFromStorage.forEach(item => addItemToDOM(item));
+    checkUI();
+}
+
 // Function to add an item
 function onAddItemSubmit(e){
     // Prevent the default form submission behavior
@@ -41,23 +48,6 @@ function addItemToDOM(item){
     itemList.appendChild(li);
 }
 
-// Function to add an item to local storage
-function addItemToStorage(item){
-    let itemsFromStorage;
-
-    if (localStorage.getItem('items') === null){
-        itemsFromStorage = [];
-    }else{
-        itemsFromStorage = JSON.parse(localStorage.getItem('items'));
-    }
-
-    //Add new item to array
-    itemsFromStorage.push(item);
-
-    //Convert to JSON string and set to local storage
-    localStorage.setItem('items',JSON.stringify(itemsFromStorage));
-}
-
 // Function to create a button with an icon
 function createButton(text, classes) {
     const button = document.createElement('button');
@@ -72,6 +62,30 @@ function createIcon(classes) {
     const icon = document.createElement('i');
     icon.className = classes;
     return icon;
+}
+
+// Function to add an item to local storage
+function addItemToStorage(item){
+    let itemsFromStorage = getItemsFromStorage();
+
+    //Add new item to array
+    itemsFromStorage.push(item);
+
+    //Convert to JSON string and set to local storage
+    localStorage.setItem('items',JSON.stringify(itemsFromStorage));
+}
+
+// Function to get items from local storage
+function getItemsFromStorage(){
+    let itemsFromStorage;
+
+    if (localStorage.getItem('items') === null){
+        itemsFromStorage = [];
+    }else{
+        itemsFromStorage = JSON.parse(localStorage.getItem('items'));
+    }
+
+    return itemsFromStorage
 }
 
 // Function to remove an item
@@ -120,10 +134,16 @@ function filterItems(e) {
     });
 }
 
-// Event listeners
-itemForm.addEventListener('submit', onAddItemSubmit);
-itemList.addEventListener('click', removeItem);
-clearBtn.addEventListener('click', clearItems);
-itemFilter.addEventListener('input', filterItems);
+// Initialize App
+function init(){
+    // Event listeners
+    itemForm.addEventListener('submit', onAddItemSubmit);
+    itemList.addEventListener('click', removeItem);
+    clearBtn.addEventListener('click', clearItems);
+    itemFilter.addEventListener('input', filterItems);
+    document.addEventListener('DOMContentLoaded', displayItems);
 
-checkUI();
+    checkUI();
+}
+
+init();
